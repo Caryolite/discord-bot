@@ -7,7 +7,7 @@ const client = new Client({
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
       GatewayIntentBits.GuildMembers,
-    //   GatewayIntentBits.GuildVoiceStates,
+      GatewayIntentBits.GuildVoiceStates,
     ],
   });
 
@@ -112,6 +112,29 @@ client.on(Events.MessageCreate,(message) => {
     }
     message.reply(`${gachaArr} `);
     }
+
+    // 語音狀態更新
+    client.on("voiceStateUpdate", (oldState, newState) => {
+    const user = newState.member?.user || oldState.member?.user;
+    const me = newState.guild.members.cache.get("988485811941023814");
+    const time = new Date().toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+    const textChannel = newState.guild.channels.cache.get("1290306962961072129"); // 文字頻道ID
+
+    if (!textChannel || !textChannel.isTextBased()) return;
+
+    if (user.tag === "caryolite_") return;
+
+    // 加入語音頻道
+    if (!oldState.channel && newState.channel) {
+        textChannel.send(`<@${me.id}> ${user.tag} 加入了語音頻道「${newState.channel.name}」 (${time})`);
+    }
+
+    // 離開語音頻道
+    else if (oldState.channel && !newState.channel) {
+        textChannel.send(`<@${me.id}> ${user.tag} 離開了語音頻道「${oldState.channel.name}」 (${time})`);
+    }
+    });
+
 })
 
 /* ------------------------------------------------------------------------- */
